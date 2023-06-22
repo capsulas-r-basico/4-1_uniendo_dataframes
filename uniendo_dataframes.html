@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>R and databases</title>
+    <meta charset="utf-8" />
+    <meta name="date" content="2023-06-22" />
+    <script src="pivot_wider_files/header-attrs-2.18/header-attrs.js"></script>
+    <link href="pivot_wider_files/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="pivot_wider_files/panelset-0.2.6/panelset.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+
+class: center, middle
+
+.linea-superior[]
+.linea-inferior[]
+
+&lt;img src="imagenes/logo_portada2.png" width="200" /&gt;
+
+## INE Educa: Clases abiertas de R
+
+## Tidy data: *pivot_wider()*
+
+## Proyecto Ciencia de Datos
+
+
+
+
+
+
+
+---
+
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tidy data
+
+En ocasiones necesitamos tranformar la distribuición o formato de nuestros dataframes, desde **wide** a **long**, o viceversa
+
+--
+
+.center[&lt;img src="imagenes/wide_long.png" height="300" /&gt;]
+
+--
+
+Para esto el paquete **tidyr** nos ofrece las funciones **pivot_longer()** y **pivot_wider()**
+
+--
+
+En este video revisaremos **pivot_wider()**
+
+
+
+
+
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tidy data *pivot_wider()*
+
+
+Esta función se puede considerar como la opuesta a **pivot_longer()**
+
+--
+
+.center[&lt;img src="imagenes/tidyr-pivot_wider_longer.gif" height="300" /&gt;]
+
+--
+
+Esta función se utiliza para ordenar un dataframe de forma tal de mostrar categorías de una variable como columnas de un dataframe
+
+--
+
+Incrementa el número de las columnas y disminuye el número de las filas
+
+--
+
+El formato **wide** es útil para la presentación de cuadros de resumen con doble entrada y es mas legible para los humanos
+
+
+---
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tidy data *pivot_wider()*
+
+Ejemplo de `pivot_wider()`:
+
+--
+
+
+```r
+df1 &lt;- data.frame(region = c(1, 2),hombres = c(100, 200),mujeres = c(50, 300))
+
+df2 &lt;- df1 %&gt;%
+  pivot_longer(cols = -region , names_to = "sexo", values_to = "total_sexo")
+
+df2
+```
+
+```
+## # A tibble: 4 × 3
+##   region sexo    total_sexo
+##    &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;
+## 1      1 hombres        100
+## 2      1 mujeres         50
+## 3      2 hombres        200
+## 4      2 mujeres        300
+```
+
+--
+
+
+```r
+library(tidyr)
+
+df2 %&gt;% 
+  pivot_wider(names_from = "sexo",values_from = "total_sexo")
+```
+
+```
+## # A tibble: 2 × 3
+##   region hombres mujeres
+##    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1      1     100      50
+## 2      2     200     300
+```
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tidy data *pivot_wider()*
+
+## Función `pivot_wider()`
+
+
+```
+## # A tibble: 2 × 3
+##   region hombres mujeres
+##    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+## 1      1     100      50
+## 2      2     200     300
+```
+
+Los argumentos más comunes de esta función son:
+
+--
+
+- *names_from*: categorías que se quiere convertir en columnas
+
+- *values_from*: columna desde la cual extraer los valores
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Tidy data
+
+En algunos casos, no contamos con una variable que contenga texto, para hacer el "pivoteo"
+
+
+```
+## # A tibble: 32 × 3
+## # Groups:   region [16]
+##    region  sexo     n
+##     &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
+##  1      1     1  1187
+##  2      1     2  1288
+##  3      2     1  1536
+##  4      2     2  1601
+##  5      3     1  1409
+##  6      3     2  1524
+##  7      4     1  2481
+##  8      4     2  2679
+##  9      5     1  5296
+## 10      5     2  5829
+## # ℹ 22 more rows
+```
+
+--
+
+En esos casos, podemos usar el parámetro **names_prefix**
+
+
+```r
+calidad::ene %&gt;%
+  group_by(region, sexo) %&gt;%
+  summarise(n = n()) %&gt;%
+  pivot_wider(names_from = sexo,
+              values_from = n,
+*             names_prefix = "sexo" )
+```
+
+```
+## # A tibble: 16 × 3
+## # Groups:   region [16]
+##    region sexo1 sexo2
+##     &lt;dbl&gt; &lt;int&gt; &lt;int&gt;
+##  1      1  1187  1288
+##  2      2  1536  1601
+##  3      3  1409  1524
+##  4      4  2481  2679
+##  5      5  5296  5829
+##  6      6  2611  2806
+##  7      7  3121  3313
+##  8      8  4975  5742
+##  9      9  2204  2420
+## 10     10  3128  3226
+## 11     11  1003  1014
+## 12     12   915   947
+## 13     13  7184  8117
+## 14     14  1771  1920
+## 15     15  1481  1543
+## 16     16  1687  1884
+```
+
+---
+
+
+class: center, middle
+
+.linea-superior[]
+.linea-inferior[]
+
+&lt;img src="imagenes/logo_portada2.png" width="200" /&gt;
+
+
+## INE Educa: Clases abiertas de R
+
+## Proyecto Ciencia de Datos
+
+## Tidy data: *pivot_wider()*
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "13:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
