@@ -48,12 +48,126 @@ xaringanExtra::use_panelset()
 
 ---
 
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Uniendo Dataframes
+
+--
+
+Básicamente existen dos maneras de unir dataframes en **dplyr**, ya sea con las funciones **join** y las funciones de **ensamblaje**.
+
+--
+
+- Las funciones **join** agregan las columnas de un dataframe (**x**) con uno (**y**), siempre respetando el identificador único de cada observación.
+
+--
+
+Creemos dos dataframes
+
+```{r}
+
+x <- data.frame(id=c(1,2,3,5), 
+                x=c("x1","x2","x3","x5"))
+
+y <- data.frame(id= c(1,2,3,4), 
+                y= c("y1","y2","y3","y4") )
+x 
+
+y
+
+```
+
+---
 
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Tidy data
+# Uniendo Dataframes - left_join()
+
+Por ejemplo la función **left_join()**, permite pegar la columna *y* del dataframe **y**, en el dataframe **x**
+
+--
+
+```{r}
+
+left_join(x, y, by = "id")
+
+```
+
+--
+
+En este caso podemos ver como **left_join()**, excluye el cuarto valor del dataframe **y**
+
+--
+
+- Los joins mantienen el orden de las filas
+
+--
+
+- El identificador utilizado en el parametro *by*, puede ser mas de una columna
+
+--
+
+.center[<img src="imagenes/left-join.gif" width="300" />]
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Uniendo Dataframes - Otros Joins
+
+.pull-left[
+
+Que agregan columnas - **mutating joins**
+
+.center[<img src="imagenes/right-join.gif" width="230" />]
+.center[<img src="imagenes/inner-join.gif" width="230" />]
+.center[<img src="imagenes/full-join.gif" width="230" />]
+]
+
+.pull-right[
+
+Que filtren observaciones - **filtering joins**
+
+.center[<img src="imagenes/semi-join.gif" width="230" />]
+
+.center[<img src="imagenes/anti-join.gif" width="230" />]
+
+]
+
+---
+
+background-image: url("imagenes/fondo2.PNG")
+background-size: contain;
+background-position: 100% 0%
+
+# Uniendo Dataframes
+
+Funciones ensamblado o pegado
+
+- Estas funciones permiten "pegar" dos dataframes, independiente de su identificador único, tanto, sumando nuevas observaciones **bind_rows()** o sumando nuevas columnas con **bind_cols()**
+
+--
+
+.center[<img src="imagenes/bind_row_cols.png" width="400" />]
+
+--
+
+```{r}
+
+bind_rows(x,y)
+
+bind_cols(x,y)
+
+```
+
+
+
 
 
 ---

@@ -3,10 +3,10 @@
   <head>
     <title>R and databases</title>
     <meta charset="utf-8" />
-    <meta name="date" content="2023-06-22" />
-    <script src="pivot_wider_files/header-attrs-2.18/header-attrs.js"></script>
-    <link href="pivot_wider_files/panelset-0.2.6/panelset.css" rel="stylesheet" />
-    <script src="pivot_wider_files/panelset-0.2.6/panelset.js"></script>
+    <meta name="date" content="2023-06-23" />
+    <script src="uniendo_dataframes_files/header-attrs-2.18/header-attrs.js"></script>
+    <link href="uniendo_dataframes_files/panelset-0.2.6/panelset.css" rel="stylesheet" />
+    <script src="uniendo_dataframes_files/panelset-0.2.6/panelset.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -22,7 +22,7 @@ class: center, middle
 
 ## INE Educa: Clases abiertas de R
 
-## Tidy data: *pivot_wider()*
+## Uniendo dataframes
 
 ## Proyecto Ciencia de Datos
 
@@ -34,107 +34,94 @@ class: center, middle
 
 ---
 
-
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Tidy data
-
-En ocasiones necesitamos tranformar la distribuición o formato de nuestros dataframes, desde **wide** a **long**, o viceversa
+# Uniendo Dataframes
 
 --
 
-.center[&lt;img src="imagenes/wide_long.png" height="300" /&gt;]
+Básicamente existen dos maneras de unir dataframes en **dplyr**, ya sea con las funciones **join** y las funciones de **ensamblaje**.
 
 --
 
-Para esto el paquete **tidyr** nos ofrece las funciones **pivot_longer()** y **pivot_wider()**
+- Las funciones **join** agregan las columnas de un dataframe (**x**) con uno (**y**), siempre respetando el identificador único de cada observación.
 
 --
 
-En este video revisaremos **pivot_wider()**
+Creemos dos dataframes
 
 
+```r
+x &lt;- data.frame(id=c(1,2,3,5), 
+                x=c("x1","x2","x3","x5"))
 
+y &lt;- data.frame(id= c(1,2,3,4), 
+                y= c("y1","y2","y3","y4") )
+x 
+```
 
+```
+##   id  x
+## 1  1 x1
+## 2  2 x2
+## 3  3 x3
+## 4  5 x5
+```
 
+```r
+y
+```
+
+```
+##   id  y
+## 1  1 y1
+## 2  2 y2
+## 3  3 y3
+## 4  4 y4
+```
 
 ---
+
 background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Tidy data *pivot_wider()*
+# Uniendo Dataframes - left_join()
 
-
-Esta función se puede considerar como la opuesta a **pivot_longer()**
-
---
-
-.center[&lt;img src="imagenes/tidyr-pivot_wider_longer.gif" height="300" /&gt;]
-
---
-
-Esta función se utiliza para ordenar un dataframe de forma tal de mostrar categorías de una variable como columnas de un dataframe
-
---
-
-Incrementa el número de las columnas y disminuye el número de las filas
-
---
-
-El formato **wide** es útil para la presentación de cuadros de resumen con doble entrada y es mas legible para los humanos
-
-
----
-background-image: url("imagenes/fondo2.PNG")
-background-size: contain;
-background-position: 100% 0%
-
-# Tidy data *pivot_wider()*
-
-Ejemplo de `pivot_wider()`:
+Por ejemplo la función **left_join()**, permite pegar la columna *y* del dataframe **y**, en el dataframe **x**
 
 --
 
 
 ```r
-df1 &lt;- data.frame(region = c(1, 2),hombres = c(100, 200),mujeres = c(50, 300))
-
-df2 &lt;- df1 %&gt;%
-  pivot_longer(cols = -region , names_to = "sexo", values_to = "total_sexo")
-
-df2
+left_join(x, y, by = "id")
 ```
 
 ```
-## # A tibble: 4 × 3
-##   region sexo    total_sexo
-##    &lt;dbl&gt; &lt;chr&gt;        &lt;dbl&gt;
-## 1      1 hombres        100
-## 2      1 mujeres         50
-## 3      2 hombres        200
-## 4      2 mujeres        300
+##   id  x    y
+## 1  1 x1   y1
+## 2  2 x2   y2
+## 3  3 x3   y3
+## 4  5 x5 &lt;NA&gt;
 ```
 
 --
 
+En este caso podemos ver como **left_join()**, excluye el cuarto valor del dataframe **y**
 
-```r
-library(tidyr)
+--
 
-df2 %&gt;% 
-  pivot_wider(names_from = "sexo",values_from = "total_sexo")
-```
+- Los joins mantienen el orden de las filas
 
-```
-## # A tibble: 2 × 3
-##   region hombres mujeres
-##    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
-## 1      1     100      50
-## 2      2     200     300
-```
+--
+
+- El identificador utilizado en el parametro *by*, puede ser mas de una columna
+
+--
+
+.center[&lt;img src="imagenes/left-join.gif" width="300" /&gt;]
 
 ---
 
@@ -142,26 +129,26 @@ background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Tidy data *pivot_wider()*
+# Uniendo Dataframes - Otros Joins
 
-## Función `pivot_wider()`
+.pull-left[
 
+Que agregan columnas - **mutating joins**
 
-```
-## # A tibble: 2 × 3
-##   region hombres mujeres
-##    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
-## 1      1     100      50
-## 2      2     200     300
-```
+.center[&lt;img src="imagenes/right-join.gif" width="230" /&gt;]
+.center[&lt;img src="imagenes/inner-join.gif" width="230" /&gt;]
+.center[&lt;img src="imagenes/full-join.gif" width="230" /&gt;]
+]
 
-Los argumentos más comunes de esta función son:
+.pull-right[
 
---
+Que filtren observaciones - **filtering joins**
 
-- *names_from*: categorías que se quiere convertir en columnas
+.center[&lt;img src="imagenes/semi-join.gif" width="230" /&gt;]
 
-- *values_from*: columna desde la cual extraer los valores
+.center[&lt;img src="imagenes/anti-join.gif" width="230" /&gt;]
+
+]
 
 ---
 
@@ -169,68 +156,52 @@ background-image: url("imagenes/fondo2.PNG")
 background-size: contain;
 background-position: 100% 0%
 
-# Tidy data
+# Uniendo Dataframes
 
-En algunos casos, no contamos con una variable que contenga texto, para hacer el "pivoteo"
+Funciones ensamblado o pegado
 
-
-```
-## # A tibble: 32 × 3
-## # Groups:   region [16]
-##    region  sexo     n
-##     &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt;
-##  1      1     1  1187
-##  2      1     2  1288
-##  3      2     1  1536
-##  4      2     2  1601
-##  5      3     1  1409
-##  6      3     2  1524
-##  7      4     1  2481
-##  8      4     2  2679
-##  9      5     1  5296
-## 10      5     2  5829
-## # ℹ 22 more rows
-```
+- Estas funciones permiten "pegar" dos dataframes, independiente de su identificador único, tanto, sumando nuevas observaciones **bind_rows()** o sumando nuevas columnas con **bind_cols()**
 
 --
 
-En esos casos, podemos usar el parámetro **names_prefix**
+.center[&lt;img src="imagenes/bind_row_cols.png" width="400" /&gt;]
+
+--
 
 
 ```r
-calidad::ene %&gt;%
-  group_by(region, sexo) %&gt;%
-  summarise(n = n()) %&gt;%
-  pivot_wider(names_from = sexo,
-              values_from = n,
-*             names_prefix = "sexo" )
+bind_rows(x,y)
 ```
 
 ```
-## # A tibble: 16 × 3
-## # Groups:   region [16]
-##    region sexo1 sexo2
-##     &lt;dbl&gt; &lt;int&gt; &lt;int&gt;
-##  1      1  1187  1288
-##  2      2  1536  1601
-##  3      3  1409  1524
-##  4      4  2481  2679
-##  5      5  5296  5829
-##  6      6  2611  2806
-##  7      7  3121  3313
-##  8      8  4975  5742
-##  9      9  2204  2420
-## 10     10  3128  3226
-## 11     11  1003  1014
-## 12     12   915   947
-## 13     13  7184  8117
-## 14     14  1771  1920
-## 15     15  1481  1543
-## 16     16  1687  1884
+##   id    x    y
+## 1  1   x1 &lt;NA&gt;
+## 2  2   x2 &lt;NA&gt;
+## 3  3   x3 &lt;NA&gt;
+## 4  5   x5 &lt;NA&gt;
+## 5  1 &lt;NA&gt;   y1
+## 6  2 &lt;NA&gt;   y2
+## 7  3 &lt;NA&gt;   y3
+## 8  4 &lt;NA&gt;   y4
 ```
+
+```r
+bind_cols(x,y)
+```
+
+```
+##   id...1  x id...3  y
+## 1      1 x1      1 y1
+## 2      2 x2      2 y2
+## 3      3 x3      3 y3
+## 4      5 x5      4 y4
+```
+
+
+
+
 
 ---
-
 
 class: center, middle
 
@@ -244,7 +215,7 @@ class: center, middle
 
 ## Proyecto Ciencia de Datos
 
-## Tidy data: *pivot_wider()*
+## Uniendo dataframes
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
