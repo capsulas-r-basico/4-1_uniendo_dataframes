@@ -56,7 +56,7 @@ background-position: 100% 0%
 
 --
 
-Básicamente existen dos maneras de unir dataframes en **dplyr**, ya sea con las funciones **join** y las funciones de **ensamblaje**.
+- Existen dos maneras de unir dataframes en **dplyr**: funciones **join** y funciones de **ensamblaje**
 
 --
 
@@ -99,7 +99,7 @@ left_join(x, y, by = "id")
 
 --
 
-En este caso podemos ver como **left_join()**, excluye el cuarto valor del dataframe **y**
+En este caso podemos ver cómo **left_join()** excluye el cuarto valor del dataframe **y**
 
 --
 
@@ -107,7 +107,7 @@ En este caso podemos ver como **left_join()**, excluye el cuarto valor del dataf
 
 --
 
-- El identificador utilizado en el parametro *by*, puede ser mas de una columna
+- El identificador utilizado en el parámetro **by** puede estar compuesto por más de una columna
 
 --
 
@@ -148,9 +148,9 @@ background-position: 100% 0%
 
 # Uniendo Dataframes
 
-Funciones ensamblado o pegado
+Funciones de ensamblado
 
-- Estas funciones permiten "pegar" dos dataframes, independiente de su identificador único, tanto, sumando nuevas observaciones **bind_rows()** o sumando nuevas columnas con **bind_cols()**
+- Estas funciones permiten "pegar" dos dataframes, independiente de su identificador único, sumando nuevas observaciones con **bind_rows()** o nuevas columnas con **bind_cols()**
 
 --
 
